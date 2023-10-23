@@ -1,7 +1,4 @@
-
-
 from flask import Flask, render_template, request, jsonify
-import spacy
 
 app = Flask(__name__)
 
@@ -203,10 +200,12 @@ class HospitalChatbot:
                 "offered services"
             ]
             
+           
         }
 
         self.intent_responses = {
-            
+
+
             "greet": "Hello! How can I assist you today?",
             "appointment_booking": "To book an appointment, please call our scheduling department at 1234567897.",
             "doctor_information": "Dr. ABC is a specialist in Neuro. You can contact them at 9874563214.",
@@ -220,26 +219,17 @@ class HospitalChatbot:
             "feedback_and_complaints": "Your feedback is valuable to us. You can provide feedback or file a complaint on our website or by contacting our patient services department.",
             "thank_you": "You're welcome! If you have any more questions, feel free to ask.",
             "general_information": "Our hospital provides a range of services, including medical, surgical, and emergency care. We also have a cafeteria for your convenience."
+        
+       
         }
 
-        self.nlp = spacy.load("en_core_web_sm")
-        self.similarity_threshold = 0.6
-
-    def calculate_similarity(self, input_text, question):
-        input_doc = self.nlp(input_text)
-        question_doc = self.nlp(question)
-        return input_doc.similarity(question_doc)
-
     def match_intent(self, sentence):
-        matched_intent = None
-        highest_similarity = self.similarity_threshold
+        sentence = sentence.lower()  # Convert to lowercase for case-insensitive matching
         for intent, questions in self.intents_and_questions.items():
             for question in questions:
-                similarity = self.calculate_similarity(sentence, question)
-                if similarity > highest_similarity:
-                    highest_similarity = similarity
-                    matched_intent = intent
-        return matched_intent
+                if question in sentence:
+                    return intent
+        return None
 
     def get_response(self, sentence):
         matched_intent = self.match_intent(sentence)
@@ -260,5 +250,4 @@ def chatbot_api():
     data = request.form['text']
     response = chatbot.get_response(data)
     return jsonify({"response": response})
-
 

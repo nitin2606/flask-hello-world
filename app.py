@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-=======
+
 
 from flask import Flask, render_template, request, jsonify
 import spacy
@@ -263,4 +262,3 @@ def chatbot_api():
     return jsonify({"response": response})
 
 
->>>>>>> b8e1d321f5893a90738c57433a72768d9cba59ef

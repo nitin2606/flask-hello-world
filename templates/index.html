@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hospital Chatbot</title>
+</head>
+<body>
+    <h1>Hospital Chatbot</h1>
+    <form id="chatbot-form">
+        <label for="user_input">Enter your question:</label>
+        <input type="text" name="text" id="user_input">
+        <button type="submit">Ask</button>
+    </form>
+    <div id="chatbot-response"></div>
+
+    <script>
+        // JavaScript code to handle form submission and response updating
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.getElementById("chatbot-form");
+            const responseDiv = document.getElementById("chatbot-response");
+
+            form.addEventListener("submit", function(event) {
+                event.preventDefault();
+                const userInput = document.getElementById("user_input").value;
+
+                // Send the user input to the server and update the response div
+                fetch("/chatbot", {
+                    method: "POST",
+                    body: new URLSearchParams({ text: userInput }),
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    responseDiv.innerHTML = data.response;
+                });
+
+                // Clear the input field
+                document.getElementById("user_input").value = "";
+            });
+        });
+    </script>
+</body>
+</html>

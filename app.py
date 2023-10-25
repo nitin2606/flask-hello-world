@@ -5,7 +5,7 @@ app = Flask(__name__)
 class HospitalChatbot:
     def __init__(self):
         self.intents_and_questions = {
-
+            
             "greet":  [
                 "hey",
                 "hello",
@@ -199,12 +199,9 @@ class HospitalChatbot:
                 "services offered",
                 "offered services"
             ]
-            
-           
         }
-
+        
         self.intent_responses = {
-
 
             "greet": "Hello! How can I assist you today?",
             "appointment_booking": "To book an appointment, please call our scheduling department at 1234567897.",
@@ -220,10 +217,11 @@ class HospitalChatbot:
             "thank_you": "You're welcome! If you have any more questions, feel free to ask.",
             "general_information": "Our hospital provides a range of services, including medical, surgical, and emergency care. We also have a cafeteria for your convenience."
         
-       
+            
         }
 
     def match_intent(self, sentence):
+        # Your intent matching code here
         sentence = sentence.lower()  # Convert to lowercase for case-insensitive matching
         for intent, questions in self.intents_and_questions.items():
             for question in questions:
@@ -232,12 +230,40 @@ class HospitalChatbot:
         return None
 
     def get_response(self, sentence):
+
         matched_intent = self.match_intent(sentence)
         if matched_intent:
             response = self.intent_responses.get(matched_intent, "I'm not sure how to answer that.")
         else:
             response = "I'm not sure how to answer that."
         return response
+    
+    
+
+def create_video_html(video_url):
+    return f'<video controls src="{video_url}" width="400"></video>'
+
+
+def get_video_response(intent):
+    video_urls = {
+
+        "greet": "https://res.cloudinary.com/dam12ojlp/video/upload/v1698260372/Output/greet_a1ngxv.mp4",
+        "appointment_booking": "https://res.cloudinary.com/dam12ojlp/video/upload/v1698260367/Output/appointment_booking_hl5uvy.mp4",
+        "doctor_information": "https://res.cloudinary.com/dam12ojlp/video/upload/v1698260369/Output/doctor_information_dq34py.mp4",
+        "department_information": "https://res.cloudinary.com/dam12ojlp/video/upload/v1698260373/Output/department_information_d7fksd.mp4",
+        "visiting_hours": "https://res.cloudinary.com/dam12ojlp/video/upload/v1698260376/Output/visiting_hours_dzvh3d.mp4",
+        "location_and_directions": "https://res.cloudinary.com/dam12ojlp/video/upload/v1698260375/Output/location_and_directions_ktkluz.mp4",
+        "billing_and_insurance": "https://res.cloudinary.com/dam12ojlp/video/upload/v1698260370/Output/billing_and_insurance_ba77n4.mp4",
+        "medical_records": "https://res.cloudinary.com/dam12ojlp/video/upload/v1698260377/Output/medical_records_akgmlx.mp4",
+        "emergency_services": "https://res.cloudinary.com/dam12ojlp/video/upload/v1698260369/Output/emergency_services_et3eyl.mp4",
+        "covid19_information": "https://res.cloudinary.com/dam12ojlp/video/upload/v1698260371/Output/covid19_information_orlff0.mp4",
+        "feedback_and_complaints": "https://res.cloudinary.com/dam12ojlp/video/upload/v1698260371/Output/feedback_and_complaints_i3ftal.mp4",
+        "thank_you": "https://res.cloudinary.com/dam12ojlp/video/upload/v1698260374/Output/thank_you_sgx29d.mp4",
+        "general_information": "https://res.cloudinary.com/dam12ojlp/video/upload/v1698260375/Output/general_information_nz2zx1.mp4"
+    
+        
+    }
+    return video_urls.get(intent, "Video not available for this intent")
 
 chatbot = HospitalChatbot()
 
@@ -249,5 +275,15 @@ def home():
 def chatbot_api():
     data = request.form['text']
     response = chatbot.get_response(data)
+    
+    intent = chatbot.match_intent(data)
+    if intent:
+        video_url = get_video_response(intent)
+        if video_url:
+            response = create_video_html(video_url)
+
     return jsonify({"response": response})
 
+
+if __name__ == '__main__':
+    app.run()

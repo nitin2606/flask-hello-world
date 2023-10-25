@@ -241,7 +241,7 @@ class HospitalChatbot:
     
 
 def create_video_html(video_url):
-    return f'<video controls src="{video_url}" width="400"></video>'
+    return f'<video controls autoplay src="{video_url}" width="400"></video>'
 
 
 def get_video_response(intent):

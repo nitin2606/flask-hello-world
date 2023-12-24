@@ -1,44 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Hospital Chatbot</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Recognition Chatbot</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"></script>
 </head>
 <body>
-    <h1>Hospital Chatbot</h1>
-    <form id="chatbot-form">
-        <label for="user_input">Enter your question:</label>
-        <input type="text" name="text" id="user_input">
-        <button type="submit">Ask</button>
-    </form>
-    <div id="chatbot-response"></div>
+    <h1>Speech Recognition Chatbot</h1>
+    <textarea id="output" rows="4" cols="50" placeholder="Processed Text and Intent"></textarea>
+    <video id="videoPlayer" width="800" height="800" autoplay controls></video>
 
     <script>
-        // JavaScript code to handle form submission and response updating
-        document.addEventListener("DOMContentLoaded", function() {
-            const form = document.getElementById("chatbot-form");
-            const responseDiv = document.getElementById("chatbot-response");
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-            form.addEventListener("submit", function(event) {
-                event.preventDefault();
-                const userInput = document.getElementById("user_input").value;
+        // Sample video URL for continuous loop
+        var sampleVideoUrl = "{{ url_for('static', filename='Friendly_new.mp4') }}";
 
-                // Send the user input to the server and update the response div
-                fetch("/chatbot", {
-                    method: "POST",
-                    body: new URLSearchParams({ text: userInput }),
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                })
-                .then((response) => response.json())
-                .then((data) => {
-                    responseDiv.innerHTML = data.response;
-                });
+        // Flag to indicate whether to play the sample video
+        var playSampleVideo = true;
 
-                // Clear the input field
-                document.getElementById("user_input").value = "";
+        startListening();
+
+        playVideo(sampleVideoUrl, true);
+
+        function startListening() {
+            socket.emit('start_listening', {});
+        }
+
+        // Play the sample video in a loop when the page loads
+        playVideo(sampleVideoUrl, true);
+
+        socket.on('text_received', function(data) {
+            var outputTextarea = document.getElementById('output');
+            outputTextarea.value = 'Text: ' + data.text + '\nIntent: ' + data.intent;
+
+            // Stop playing the sample video
+            playSampleVideo = false;
+
+            // Play the answer video
+            playVideo(data.video_url, false, function() {
+                // After the answer video ends, resume playing the sample video in a loop
+                playSampleVideo = true;
+                playVideo(sampleVideoUrl, true);
             });
         });
+
+        function playVideo(videoUrl, loop, onEndedCallback) {
+            var videoPlayer = document.getElementById('videoPlayer');
+
+            //videoPlayer.controls = false;
+            videoPlayer.src = videoUrl;
+            videoPlayer.loop = loop;
+            
+
+            videoPlayer.play();
+
+            if (onEndedCallback) {
+                videoPlayer.onended = onEndedCallback;
+            }
+
+            videoPlayer.play();
+        }
     </script>
 </body>
 </html>
